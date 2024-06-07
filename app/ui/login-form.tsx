@@ -77,7 +77,7 @@ export default function LoginForm() {
         </div>
         <div className="mt-1">
         <h3 className={`${lusitana.className} mb-3 text-xl`}>
-          Don't have an account yet?
+          Don&apos;t have an account yet?
         </h3>
           <Link href="/register">
             <Button className="w-full">

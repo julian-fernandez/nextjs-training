@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { signIn } from '@/auth';
 import { AuthError } from 'next-auth';
+import bcrypt from 'bcrypt';
 
 export type State = {
   errors?: {
@@ -134,5 +135,39 @@ export async function authenticate(
       }
     }
     throw error;
+  }
+}
+
+const signupSchema = z.object({
+  name: z.string().min(3, 'Name must be at least 3 characters long'),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters long'),
+});
+
+type SignupCredentials = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export async function signup(credentials: SignupCredentials): Promise<{ success: boolean; error: string | null }> {
+  const parsedCredentials = signupSchema.safeParse(credentials);
+  if (!parsedCredentials.success) {
+    const errorMessages = parsedCredentials.error.errors.map((err) => err.message).join(', ');
+    return { success: false, error: errorMessages };
+  }
+
+  const { name, email, password } = parsedCredentials.data;
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  try {
+    await sql`
+      INSERT INTO users (name, email, password)
+      VALUES (${name}, ${email}, ${hashedPassword})
+    `;
+    return { success: true, error: null };
+  } catch (error) {
+    console.error('Failed to sign up:', error);
+    return { success: false, error: 'Failed to sign up.' };
   }
 }

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import { lusitana } from '@/app/ui/fonts';
 import {
@@ -10,6 +10,7 @@ import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from './button';
 import { useFormState, useFormStatus } from 'react-dom';
 import { authenticate } from '@/app/lib/actions';
+import Link from 'next/link';  // Import Link from next/link
 
 export default function LoginForm() {
   const [errorMessage, dispatch] = useFormState(authenticate, undefined);
@@ -73,6 +74,16 @@ export default function LoginForm() {
               <p className="text-sm text-red-500">{errorMessage}</p>
             </>
           )}
+        </div>
+        <div className="mt-1">
+        <h3 className={`${lusitana.className} mb-3 text-xl`}>
+          Don't have an account yet?
+        </h3>
+          <Link href="/register">
+            <Button className="w-full">
+              Register
+            </Button>
+          </Link>
         </div>
       </div>
     </form>
